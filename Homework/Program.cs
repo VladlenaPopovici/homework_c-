@@ -64,16 +64,32 @@ namespace Homework1
 
         static void Main(string[] args)
         {
+            PrintTitle();
+            
+            Hero customHero = CreateHero();
+            PrintHero(customHero);
+            Thread.Sleep(2000);
+            Console.WriteLine("Printing default hero");
+            Hero defaultHero = new Hero();
+            PrintHero(defaultHero);
+            Thread.Sleep(2000);
+            Console.WriteLine("Printing random hero");
+            Hero randomHero = Hero.GenerateRandom();
+            PrintHero(randomHero);
+        }
+
+        private static void PrintHero(Hero hero)
+        {
+            hero.Print(); //Print character method
+            Console.WriteLine(GetReplica(hero));
+        }
+
+        private static void PrintTitle()
+        {
             ProgressBar();
             ClearConsole();
             PrintLogo();
             ClearConsole();
-            Hero hero = CreateHero();
-            Console.WriteLine(hero);
-            Console.WriteLine(GetReplica(hero));
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("What do you think about your hero? Write bellow");
-            Console.ReadLine();
         }
 
         private static string GetReplica(Hero hero)
@@ -194,11 +210,11 @@ namespace Homework1
                 Console.SetCursorPosition(1, 1);
                 if (i < 90)
                 {
-                    Thread.Sleep(50);
+                    Thread.Sleep(20);
                 }
                 else
                 {
-                    Thread.Sleep(100);
+                    Thread.Sleep(50);
                 }
             }
         }
@@ -230,17 +246,55 @@ namespace Homework1
         }
     }
 
-    public class Hero
+    public class Hero : IPrintable
     {
+        private static readonly Array ClassValues = Enum.GetValues(typeof(Class));
+        private static readonly Array RaceValues = Enum.GetValues(typeof(Race));
+        private static readonly Array GenderValues = Enum.GetValues(typeof(Gender));
+        private static readonly Random Random = new Random();
         public Class Clazz { get; }
         public Race Race { get; }
         public Gender Gender { get; }
+
+        public Hero() //Default constructor
+        {
+            Clazz = Class.Archer;
+            Race = Race.Elf;
+            Gender = Gender.Male;
+        }
 
         public Hero(Class clazz, Race race, Gender gender)
         {
             Clazz = clazz;
             Race = race;
             Gender = gender;
+        }
+
+        public static Hero GenerateRandom()
+        {
+            return new Hero(
+                GetRandomClass(),
+                GetRandomRace(),
+                GetRandomGender()
+            );
+        }
+
+        private static Class GetRandomClass()
+        {
+            return (Class)ClassValues.GetValue(Random.Next(ClassValues.Length));
+        }
+        private static Race GetRandomRace()
+        {
+            return (Race)RaceValues.GetValue(Random.Next(RaceValues.Length));
+        }
+        private static Gender GetRandomGender()
+        {
+            return (Gender)GenderValues.GetValue(Random.Next(GenderValues.Length));
+        }
+
+        public void Print()
+        {
+            Console.WriteLine(this);
         }
 
         public override string ToString()
@@ -273,5 +327,10 @@ namespace Homework1
     {
         Male = 1,
         Female,
+    }
+
+    public interface IPrintable
+    {
+        void Print();
     }
 }
